@@ -61,11 +61,12 @@ void sr::SoftwareRasteriser::renderTriangle(int index) {
     for (int y = y_min; y < y_max; y++) {
         for (int x = x_min; x < x_max; x++) {
             if ((x+y)%16 == 0) state = !state;
-            if (state) {
-                this->m_screenBuffer[getPixelLocation(x, y)] = 0xff;
-                this->m_screenBuffer[getPixelLocation(x, y) + 1] = 0xff;
-                this->m_screenBuffer[getPixelLocation(x, y) + 2] = 0xff;
-            }
+            if (pointWithinTriangle(x, y, this->vertices[triangleVertices[0]], this->vertices[triangleVertices[1]], this->vertices[triangleVertices[2]]))
+                if (state) {
+                    this->m_screenBuffer[getPixelLocation(x, y)] = 0xff;
+                    this->m_screenBuffer[getPixelLocation(x, y) + 1] = 0xff;
+                    this->m_screenBuffer[getPixelLocation(x, y) + 2] = 0xff;
+                }
         }
     }
 }
@@ -76,4 +77,13 @@ void sr::SoftwareRasteriser::clearDepthBuffer() {
             this->m_depthBuffer[y * this->width + x] = INT32_MIN;
         }
     }
+}
+
+bool sr::SoftwareRasteriser::pointWithinTriangle(int x, int y, int* A, int* B, int* C) {
+    int P[3] = {x, y, 1};
+    return CWCheck(P, B, C) && CWCheck(P, C, A) && CWCheck(P, A, B);
+}
+
+bool sr::SoftwareRasteriser::CWCheck(int *A, int *B, int *C) {
+    return (B[0] - A[0])*(B[1] + A[1]) + (C[0] - B[0])*(B[1] + C[1]) + (A[0] - C[0])*(A[1] + C[1]) < 0;
 }
