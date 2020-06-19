@@ -61,12 +61,12 @@ void sr::SoftwareRasteriser::renderTriangle(int index) {
     for (int y = y_min; y < y_max; y++) {
         for (int x = x_min; x < x_max; x++) {
             if ((x+y)%16 == 0) state = !state;
-            if (pointWithinTriangle(x, y, this->vertices[triangleVertices[0]], this->vertices[triangleVertices[1]], this->vertices[triangleVertices[2]]))
-                if (state) {
-                    this->m_screenBuffer[getPixelLocation(x, y)] = 0xff;
-                    this->m_screenBuffer[getPixelLocation(x, y) + 1] = 0xff;
-                    this->m_screenBuffer[getPixelLocation(x, y) + 2] = 0xff;
-                }
+            float bary[3];
+            int P[3] = {x, y, 1};
+            barycentric(P, this->vertices[triangleVertices[0]], this->vertices[triangleVertices[1]], this->vertices[triangleVertices[2]], bary);
+            if (bary[0] >= 0 && bary[1] >= 0 && bary[2] >= 0) {
+                this->m_screenBuffer[getPixelLocation(x, y)] = 0xff;
+            }
         }
     }
 }
@@ -84,6 +84,18 @@ bool sr::SoftwareRasteriser::pointWithinTriangle(int x, int y, int* A, int* B, i
     return CWCheck(P, B, C) && CWCheck(P, C, A) && CWCheck(P, A, B);
 }
 
+// TODO: Migrate to barycentric system so we can check more easily
 bool sr::SoftwareRasteriser::CWCheck(int *A, int *B, int *C) {
-    return (B[0] - A[0])*(B[1] + A[1]) + (C[0] - B[0])*(B[1] + C[1]) + (A[0] - C[0])*(A[1] + C[1]) < 0;
+    return triangularArea(A, B, C) < 0;
+}
+
+int sr::SoftwareRasteriser::triangularArea(int *A, int *B, int *C) {
+    return (B[0] - A[0])*(B[1] + A[1]) + (C[0] - B[0])*(B[1] + C[1]) + (A[0] - C[0])*(A[1] + C[1]);
+}
+
+void sr::SoftwareRasteriser::barycentric(int *P, int *A, int *B, int *C, float *result) {
+    float tot = triangularArea(A, B, C);
+    result[0] = float(triangularArea(P, B, C)) / tot;
+    result[1] = float(triangularArea(P, C, A)) / tot;
+    result[2] = float(triangularArea(P, A, B)) / tot;
 }
