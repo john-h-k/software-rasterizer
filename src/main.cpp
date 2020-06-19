@@ -2,6 +2,7 @@
 
 #include <iostream>
 #include <cstdint>
+#include <vector>
 
 #include "SoftwareRasteriser.hpp"
 
@@ -33,14 +34,22 @@ int main() {
     sr::SoftwareRasteriser softwareRasteriser(SCREEN_WIDTH, SCREEN_HEIGHT);
     softwareRasteriser.colour(0xff, 0xff, 0x00);
 
-    uint64_t framecount = 0;
+    int v1[3] = {SCREEN_WIDTH / 2, 0, 1};
+    int v2[3] = {(SCREEN_WIDTH * 3)/4, SCREEN_HEIGHT, 1};
+    int v3[3] = {0, SCREEN_HEIGHT, 1};
+    std::vector<int*> vertices = {v1, v2, v3};
+    int f1[3] = {0,1,2};
+    std::vector<int*> faces = {f1};
+
+    softwareRasteriser.load(vertices.data(), faces.size(), faces.data(), nullptr);
+
     glfwMakeContextCurrent(window);
     while (!glfwWindowShouldClose(window)) {
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+        softwareRasteriser.render();
         glDrawPixels(SCREEN_WIDTH, SCREEN_HEIGHT, GL_RGB, GL_UNSIGNED_BYTE, softwareRasteriser.getBuffer());
-        softwareRasteriser.colour(0xff, 0xff * (framecount % 2), 0x00);
         glfwSwapBuffers(window);
-        framecount++;
+        glfwWaitEvents();
     }
 
     glfwDestroyWindow(window);
