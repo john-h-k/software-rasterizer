@@ -1,6 +1,9 @@
 #include <GLFW/glfw3.h>
+
 #include <iostream>
 #include <cstdint>
+
+#include "SoftwareRasteriser.hpp"
 
 const int SCREEN_WIDTH = 640;
 const int SCREEN_HEIGHT = 480;
@@ -26,21 +29,18 @@ int main() {
         glfwTerminate();
         return -1;
     }
-    uint8_t* screenBuffer = new uint8_t[SCREEN_WIDTH * SCREEN_HEIGHT * 3];
-    for (int y = 0; y < SCREEN_HEIGHT; y++) {
-        for (int x = 0; x < SCREEN_WIDTH; x++) {
-            screenBuffer[y * SCREEN_WIDTH * 3 + x * 3] = 0x25;
-            screenBuffer[y * SCREEN_WIDTH * 3 + x * 3 + 1] = 0x34;
-            screenBuffer[y * SCREEN_WIDTH * 3 + x * 3 + 2] = 0xff;
-        }
-    }
+
+    sr::SoftwareRasteriser softwareRasteriser(SCREEN_WIDTH, SCREEN_HEIGHT);
+    softwareRasteriser.colour(0xff, 0xff, 0x00);
+
+    uint64_t framecount = 0;
     glfwMakeContextCurrent(window);
     while (!glfwWindowShouldClose(window)) {
-
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-        glDrawPixels(640, 480, GL_RGB, GL_UNSIGNED_BYTE, screenBuffer);
+        glDrawPixels(SCREEN_WIDTH, SCREEN_HEIGHT, GL_RGB, GL_UNSIGNED_BYTE, softwareRasteriser.getBuffer());
+        softwareRasteriser.colour(0xff, 0xff * (framecount % 2), 0x00);
         glfwSwapBuffers(window);
-        glfwWaitEvents();
+        framecount++;
     }
 
     glfwDestroyWindow(window);

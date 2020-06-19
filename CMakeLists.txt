@@ -3,7 +3,7 @@ project(SoftwareRasteriser)
 
 set(CMAKE_CXX_STANDARD 20)
 
-add_executable(SoftwareRasteriser src/main.cpp)
+add_executable(SoftwareRasteriser src/main.cpp src/SoftwareRasteriser.cpp src/SoftwareRasteriser.hpp)
 
 if (WIN32)
     target_include_directories(SoftwareRasteriser PRIVATE ./external/include)
