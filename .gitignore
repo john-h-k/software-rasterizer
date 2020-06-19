@@ -1,0 +1,29 @@
+# Build directories
+cmake-build-debug/
+build/
+out/
+dist/
+
+# CMake Stuff
+CMakeLists.txt.user
+CMakeCache.txt
+CMakeFiles
+CMakeScripts
+Testing
+Makefile
+cmake_install.cmake
+install_manifest.txt
+compile_commands.json
+CTestTestfile.cmake
+_deps
+
+# Editor-specific directories
+.vs/
+.vscode/
+.idea/
+
+# Compiled Binaries / Libraries
+*.o
+*.a
+*.so
+*.dll
