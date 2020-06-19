@@ -10,5 +10,6 @@ if (WIN32)
     target_link_directories(SoftwareRasteriser PRIVATE ./external/libs)
 endif()
 
-find_library(GLFW_LIB glfw)
-target_link_libraries(SoftwareRasteriser PRIVATE "${GLFW_LIB}")
+find_library(GLFW_LIB glfw REQUIRED)
+find_library(OPENGL_LIB GL REQUIRED)
+target_link_libraries(SoftwareRasteriser PRIVATE "${GLFW_LIB}" "${OPENGL_LIB}")
