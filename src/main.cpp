@@ -40,8 +40,13 @@ int main() {
     std::vector<int*> vertices = {v1, v2, v3};
     int f1[3] = {0,1,2};
     std::vector<int*> faces = {f1};
+    uint8_t tr[3] = {0xff, 0, 0};
+    uint8_t tg[3] = {0, 0xff, 0};
+    uint8_t tb[3] = {0, 0, 0xff};
+    std::vector<uint8_t*> vertex_colours = {tr, tg, tb};
 
-    softwareRasteriser.load(vertices.data(), faces.size(), faces.data(), nullptr);
+
+    softwareRasteriser.load(vertices.data(), faces.size(), faces.data(), vertex_colours.data());
 
     glfwMakeContextCurrent(window);
     while (!glfwWindowShouldClose(window)) {

@@ -65,7 +65,19 @@ void sr::SoftwareRasteriser::renderTriangle(int index) {
             int P[3] = {x, y, 1};
             barycentric(P, this->vertices[triangleVertices[0]], this->vertices[triangleVertices[1]], this->vertices[triangleVertices[2]], bary);
             if (bary[0] >= 0 && bary[1] >= 0 && bary[2] >= 0) {
-                this->m_screenBuffer[getPixelLocation(x, y)] = 0xff;
+                // TODO: Neaten with for loop
+                this->m_screenBuffer[getPixelLocation(x, y)] =
+                        (float)this->vertex_colours[triangleVertices[0]][0] * bary[0] +
+                        (float)this->vertex_colours[triangleVertices[1]][0] * bary[1] +
+                        (float)this->vertex_colours[triangleVertices[2]][0] * bary[2];
+                this->m_screenBuffer[getPixelLocation(x, y) + 1] =
+                        (float)this->vertex_colours[triangleVertices[0]][1] * bary[0] +
+                        (float)this->vertex_colours[triangleVertices[1]][1] * bary[1] +
+                        (float)this->vertex_colours[triangleVertices[2]][1] * bary[2];
+                this->m_screenBuffer[getPixelLocation(x, y) + 2] =
+                        (float)this->vertex_colours[triangleVertices[0]][2] * bary[0] +
+                        (float)this->vertex_colours[triangleVertices[1]][2] * bary[1] +
+                        (float)this->vertex_colours[triangleVertices[2]][2] * bary[2];
             }
         }
     }
@@ -84,7 +96,6 @@ bool sr::SoftwareRasteriser::pointWithinTriangle(int x, int y, int* A, int* B, i
     return CWCheck(P, B, C) && CWCheck(P, C, A) && CWCheck(P, A, B);
 }
 
-// TODO: Migrate to barycentric system so we can check more easily
 bool sr::SoftwareRasteriser::CWCheck(int *A, int *B, int *C) {
     return triangularArea(A, B, C) < 0;
 }
