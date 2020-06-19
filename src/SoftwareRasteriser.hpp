@@ -38,7 +38,8 @@ namespace sr {
 
 
         void renderTriangle(int index);
-
+        bool pointWithinTriangle(int x, int y, int* A, int* B, int* C);
+        bool CWCheck(int* A, int* B, int* C);
         uint8_t *m_screenBuffer;
         int32_t *m_depthBuffer;
     };
