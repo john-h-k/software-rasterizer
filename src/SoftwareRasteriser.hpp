@@ -7,11 +7,70 @@
 
 #include <cstdint>
 namespace sr {
+    struct Colour {
+        uint8_t r;
+        uint8_t g;
+        uint8_t b;
+        Colour(uint8_t r, uint8_t g, uint8_t b) : r(r), g(g), b(b) {}
+        Colour() = default;
+        uint8_t& operator[](int a) {
+            switch(a) {
+                case 0:
+                    return r;
+                case 1:
+                    return g;
+                case 2:
+                    return b;
+                default:
+                    return b;
+            }
+        }
+    };
+
+    struct Vec3 {
+        int x;
+        int y;
+        int z;
+        Vec3(int x, int y, int z) : x(x), y(y), z(z) {}
+        Vec3() = default;
+        int& operator[](int a) {
+            switch(a) {
+                case 0:
+                    return x;
+                case 1:
+                    return y;
+                case 2:
+                    return z;
+                default:
+                    return z;
+            }
+        }
+    };
+
+    struct Vec3f {
+        float x;
+        float y;
+        float z;
+        Vec3f(float x, float y, float z) : x(x), y(y), z(z) {}
+        Vec3f() = default;
+        float& operator[](int a) {
+            switch(a) {
+                case 0:
+                    return x;
+                case 1:
+                    return y;
+                case 2:
+                    return z;
+                default:
+                    return z;
+            }
+        }
+    };
+
     class SoftwareRasteriser {
     public:
         SoftwareRasteriser(int width, int height) : width(width), height(height) {
-            // 3 is for the colour profile
-            this->m_screenBuffer = new uint8_t[height * width * 3];
+            this->m_screenBuffer = new Colour[height * width];
             this->m_depthBuffer = new int32_t[height * width];
             clearDepthBuffer();
         }
@@ -22,27 +81,26 @@ namespace sr {
 
         void colour(uint8_t r, uint8_t g, uint8_t b);
         void clearDepthBuffer();
-        void load(int** vertices, int num_faces, int** faces, uint8_t** vertex_colours);
+        void load(Vec3 *vertices, int num_faces, Vec3 *faces, Colour *vertex_colours);
         inline int getPixelLocation(int x, int y);
         void render();
         uint8_t *getBuffer();
 
         int width;
         int height;
-        // TODO: Move into structs
-        int **vertices = nullptr;
-        int **faces = nullptr;
-        uint8_t **vertex_colours = nullptr;
+        Vec3 *vertices = nullptr;
+        Vec3 *faces = nullptr;
+        Colour *vertex_colours = nullptr;
         int num_faces = 0;
     private:
 
 
         void renderTriangle(int index);
-        bool pointWithinTriangle(int x, int y, int* A, int* B, int* C);
-        bool CWCheck(int* A, int* B, int* C);
-        int triangularArea(int* A, int* B, int* C);
-        void barycentric(int* P, int* A, int* B, int* C, float* result);
-        uint8_t *m_screenBuffer;
+        static bool pointWithinTriangle(int x, int y, Vec3& A, Vec3& B, Vec3& C);
+        static bool CWCheck(Vec3& A, Vec3& B, Vec3& C);
+        static int triangularArea(Vec3& A, Vec3& B, Vec3& C);
+        static void barycentric(Vec3& P, Vec3& A, Vec3& B, Vec3& C, Vec3f& result);
+        Colour *m_screenBuffer;
         int32_t *m_depthBuffer;
     };
 
