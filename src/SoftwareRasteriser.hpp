@@ -7,6 +7,7 @@
 
 #include <cstdint>
 namespace sr {
+
     struct Colour {
         uint8_t r;
         uint8_t g;
@@ -67,11 +68,13 @@ namespace sr {
         }
     };
 
+    typedef void (*FragmentShaderFunc)(Vec3 position, int frames, Colour& colour);
+
     class SoftwareRasteriser {
     public:
-        SoftwareRasteriser(int width, int height) : width(width), height(height) {
-            this->m_screenBuffer = new Colour[height * width];
-            this->m_depthBuffer = new int32_t[height * width];
+        SoftwareRasteriser(int width, int height) : m_width(width), m_height(height) {
+            m_screenBuffer = new Colour[height * width];
+            m_depthBuffer = new int32_t[height * width];
             clearDepthBuffer();
         }
         ~SoftwareRasteriser() {
@@ -82,16 +85,10 @@ namespace sr {
         void colour(uint8_t r, uint8_t g, uint8_t b);
         void clearDepthBuffer();
         void load(Vec3 *vertices, int num_faces, Vec3 *faces, Colour *vertex_colours);
+        void loadFragmentShader(FragmentShaderFunc fragmentShader);
         inline int getPixelLocation(int x, int y);
         void render();
         uint8_t *getBuffer();
-
-        int width;
-        int height;
-        Vec3 *vertices = nullptr;
-        Vec3 *faces = nullptr;
-        Colour *vertex_colours = nullptr;
-        int num_faces = 0;
     private:
 
 
@@ -100,8 +97,18 @@ namespace sr {
         static bool CWCheck(Vec3& A, Vec3& B, Vec3& C);
         static int triangularArea(Vec3& A, Vec3& B, Vec3& C);
         static void barycentric(Vec3& P, Vec3& A, Vec3& B, Vec3& C, Vec3f& result);
+
         Colour *m_screenBuffer;
         int32_t *m_depthBuffer;
+        int m_width;
+        int m_height;
+
+        int m_frameCount = 0;
+        FragmentShaderFunc m_fragmentShader = nullptr;
+        Vec3* m_vertices = nullptr;
+        Vec3* m_faces = nullptr;
+        Colour* m_vertexColours = nullptr;
+        int m_numFaces = 0;
     };
 
 }
