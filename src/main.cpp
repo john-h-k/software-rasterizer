@@ -9,6 +9,20 @@
 const int SCREEN_WIDTH = 640;
 const int SCREEN_HEIGHT = 480;
 
+inline void fragmentShaderExample(sr::Vec3 position, int frames, sr::Colour& colour)
+{
+    if (colour.r == 0 && colour.g == 0 && colour.b == 0)
+    {
+        if (position.y < SCREEN_HEIGHT / 2)
+        {
+			colour.r = abs(sin(frames / 360.0)) * 255.0;
+		} else
+		{
+            colour.g = abs(cos(frames / 360.0)) * 255.0;
+		}
+    }
+}
+
 void errorCallback(int error, const char* description) {
     std::cerr << "Error: " << description << " - code: " << error << std::endl;
 }
@@ -47,6 +61,7 @@ int main() {
 
 
     softwareRasteriser.load(vertices.data(), faces.size(), faces.data(), vertex_colours.data());
+    softwareRasteriser.loadFragmentShader(fragmentShaderExample);
 
     glfwMakeContextCurrent(window);
     while (!glfwWindowShouldClose(window)) {
