@@ -4,7 +4,7 @@
 #include <cstdint>
 #include <vector>
 
-#include "SoftwareRasteriser.hpp"
+#include "SoftwareRasterizer.h"
 
 const int SCREEN_WIDTH = 640;
 const int SCREEN_HEIGHT = 480;
@@ -31,8 +31,8 @@ int main() {
         return -1;
     }
 
-    sr::SoftwareRasteriser softwareRasteriser(SCREEN_WIDTH, SCREEN_HEIGHT);
-    softwareRasteriser.colour(0xff, 0xff, 0x00);
+    sr::SoftwareRasterizer SoftwareRasterizer(SCREEN_WIDTH, SCREEN_HEIGHT);
+    SoftwareRasterizer.colour(0xff, 0xff, 0x00);
 
     int v1[3] = {SCREEN_WIDTH / 2, 0, 1};
     int v2[3] = {(SCREEN_WIDTH * 3)/4, SCREEN_HEIGHT, 1};
@@ -46,13 +46,13 @@ int main() {
     std::vector<uint8_t*> vertex_colours = {tr, tg, tb};
 
 
-    softwareRasteriser.load(vertices.data(), faces.size(), faces.data(), vertex_colours.data());
+    SoftwareRasterizer.load(vertices.data(), faces.size(), faces.data(), vertex_colours.data());
 
     glfwMakeContextCurrent(window);
     while (!glfwWindowShouldClose(window)) {
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-        softwareRasteriser.render();
-        glDrawPixels(SCREEN_WIDTH, SCREEN_HEIGHT, GL_RGB, GL_UNSIGNED_BYTE, softwareRasteriser.getBuffer());
+        SoftwareRasterizer.render();
+        glDrawPixels(SCREEN_WIDTH, SCREEN_HEIGHT, GL_RGB, GL_UNSIGNED_BYTE, SoftwareRasterizer.getBuffer());
         glfwSwapBuffers(window);
         glfwWaitEvents();
     }
