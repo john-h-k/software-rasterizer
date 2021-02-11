@@ -6,7 +6,44 @@
 #define SOFTWARERASTERISER_SOFTWARERASTERISER_HPP
 
 #include <cstdint>
+#include <cmath>
+#include <vector>
+
+
+using dim_t = uint32_t;
+
 namespace sr {
+    template <typename TElement>
+    class Image
+    {
+        using dim_t = uint32_t;
+    public:
+        Image(dim_t width, dim_t y)
+            : m_width(width), m_height(height), m_data(width * height)
+        {
+        }
+
+        inline void fill(TElement&& value)
+        {
+            for (auto& elem : m_data)
+            {
+                elem = value;
+            }
+        }
+
+        inline TElement& operator() (dim_t x, dim_t y)
+        {
+            auto p = m_data.data();
+            auto pRow = p + (y * width);
+            return pRow + x;
+        }
+        inline dim_t width() { return m_width; }
+        inline dim_t height() { return m_height; }
+    private:
+        dim_t m_width, m_height;
+        std::vector<TElement> m_data;
+    };
+
     struct Colour {
         uint8_t r;
         uint8_t g;
@@ -69,14 +106,10 @@ namespace sr {
 
     class SoftwareRasteriser {
     public:
-        SoftwareRasteriser(int width, int height) : width(width), height(height) {
-            this->m_screenBuffer = new Colour[height * width];
-            this->m_depthBuffer = new int32_t[height * width];
+        SoftwareRasteriser(dim_t height, dim_t width) :
+            m_screenBuffer(height, width),
+            m_depthBuffer(height, width) {
             clearDepthBuffer();
-        }
-        ~SoftwareRasteriser() {
-            delete[] m_screenBuffer;
-            delete[] m_depthBuffer;
         }
 
         void colour(uint8_t r, uint8_t g, uint8_t b);
@@ -93,15 +126,14 @@ namespace sr {
         Colour *vertex_colours = nullptr;
         int num_faces = 0;
     private:
-
+        Image<uint32_t> m_screenBuffer;
+        Image<float_t> m_depthBuffer;
 
         void renderTriangle(int index);
         static bool pointWithinTriangle(int x, int y, Vec3& A, Vec3& B, Vec3& C);
         static bool CWCheck(Vec3& A, Vec3& B, Vec3& C);
         static int triangularArea(Vec3& A, Vec3& B, Vec3& C);
         static void barycentric(Vec3& P, Vec3& A, Vec3& B, Vec3& C, Vec3f& result);
-        Colour *m_screenBuffer;
-        int32_t *m_depthBuffer;
     };
 
 }
